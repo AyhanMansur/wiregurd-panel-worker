@@ -1,0 +1,172 @@
+addEventListener('fetch', event => {
+  event.respondWith(router(event.request));
+});
+
+/* ==================== SERVER CONFIG ==================== */
+const SERVER_PUBLIC_KEY = "bZADKDZJMB0Y0cHaqhoXr2CSAmqCgnah0TV+zHHFnxw=";
+const SERVER_ENDPOINT = "132.175.48.13:19348";
+
+/* ==================== X25519 KEYS ==================== */
+function clamp(k){k[0]&=248;k[31]&=127;k[31]|=64;return k;}
+function add(a,b){let o=new Uint8Array(32);for(let i=0;i<32;i++)o[i]=(a[i]+b[i])&255;return o;}
+function sub(a,b){let o=new Uint8Array(32);for(let i=0;i<32;i++)o[i]=(a[i]-b[i]+256)&255;return o;}
+function mul(a,b){let o=new Uint16Array(64);let r=new Uint8Array(32);for(let i=0;i<32;i++)for(let j=0;j<32;j++)o[i+j]+=a[i]*b[j];for(let i=0;i<63;i++){o[i+1]+=o[i]>>>8;o[i]&=255;}for(let i=0;i<32;i++)r[i]=o[i];return r;}
+function sq(a){return mul(a,a);}
+function inv(a){let t=a.slice(0);for(let i=0;i<253;i++)t=mul(t,a);return t;}
+function x25519(k,u){let x1=u.slice(0);let x2=new Uint8Array(32);x2[0]=1;let z2=new Uint8Array(32);let x3=x1.slice(0);let z3=new Uint8Array(32);z3[0]=1;let swap=0;for(let pos=254;pos>=0;pos--){let b=(k[pos>>>3]>>>(pos&7))&1;swap^=b;if(swap){[x2,x3]=[x3,x2];[z2,z3]=[z3,z2];}swap=b;let A=add(x2,z2);let B=sub(x2,z2);let C=add(x3,z3);let D=sub(x3,z3);let DA=mul(D,A);let CB=mul(C,B);x3=sq(add(DA,CB));z3=mul(x1,sq(sub(DA,CB)));x2=sq(A);z2=sq(B);}if(swap){[x2,x3]=[x3,x2];[z2,z3]=[z3,z2];}return mul(x2,inv(z2));}
+function generateKeypair(){let priv=new Uint8Array(32);crypto.getRandomValues(priv);priv=clamp(priv);let base=new Uint8Array(32);base[0]=9;let pub=x25519(priv,base);return {privateKey:btoa(String.fromCharCode(...priv)),publicKey:btoa(String.fromCharCode(...pub))};}
+
+/* ==================== QR CODE ==================== */
+async function makeQR(conf){
+  const url = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data="+encodeURIComponent(conf);
+  const resp = await fetch(url);
+  const buf = await resp.arrayBuffer();
+  return "data:image/png;base64,"+btoa(String.fromCharCode(...new Uint8Array(buf)));
+}
+
+/* ==================== ROUTER ==================== */
+async function router(req){
+  const url = new URL(req.url);
+  const defaultName = url.searchParams.get("name") || "client01";
+
+  if(url.pathname === "/generate"){
+    const keys = generateKeypair();
+    const clientIP = "10.8.0.2/32";
+    const config = `
+[Interface]
+PrivateKey = ${keys.privateKey}
+Address = ${clientIP}
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = ${SERVER_PUBLIC_KEY}
+Endpoint = ${SERVER_ENDPOINT}
+PersistentKeepalive = 25
+`.trim();
+
+    const qr = await makeQR(config);
+
+    return new Response(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WireGuard Config</title>
+<style>
+body {margin:0; font-family:Arial; color:#e6e6e6;
+      background:linear-gradient(140deg,#0a0a0c,#111119,#0c0c11);
+      background-size:400% 400%; animation:bgmove 14s ease infinite;}
+@keyframes bgmove{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+
+.container {display:flex; justify-content:center; align-items:flex-start; gap:50px; flex-wrap:wrap; padding:50px;}
+
+.qr {width:300px; height:300px; border-radius:20px; border:2px solid rgba(0,140,255,0.6);
+     box-shadow:0 0 25px #0c84ff,0 0 50px #0c84ff44; animation:qrGlow 2.5s ease-in-out infinite alternate;}
+@keyframes qrGlow {0%{box-shadow:0 0 20px #0c84ff,0 0 40px #0c84ff44;}50%{box-shadow:0 0 30px #0c84ff77,0 0 60px #0c84ff22;}100%{box-shadow:0 0 40px #0c84ff99,0 0 80px #0c84ff33;}}
+
+.card {flex:1; min-width:300px; max-width:500px; padding:40px; border-radius:30px;
+       background:rgba(255,255,255,0.05); backdrop-filter:blur(22px) saturate(200%);
+       border:1px solid rgba(255,255,255,0.15); box-shadow:0 12px 40px rgba(0,0,0,0.7);
+       transition:0.4s; animation:float 5s ease-in-out infinite;}
+.card:hover {box-shadow:0 20px 60px rgba(0,0,0,0.9); transform:translateY(-5px) scale(1.02);}
+@keyframes float{0%{transform:translateY(0);}50%{transform:translateY(-10px);}100%{transform:translateY(0);}}
+
+input[type="text"] {width:80%; padding:12px; margin-top:10px; background:rgba(0,0,0,0.3);
+       border:none; color:white; border-radius:14px; backdrop-filter:blur(10px); transition:0.3s;
+       box-shadow:0 5px 15px rgba(0,0,0,0.5);}
+input[type="text"]:focus {outline:none; box-shadow:0 5px 25px rgba(0,140,255,0.7); transform:scale(1.02);}
+
+/* Liquid-glass circular button */
+a.btn {display:inline-block; margin-top:20px; padding:16px 32px; border-radius:50px;
+       background:rgba(0,140,255,0.35); backdrop-filter:blur(14px);
+       color:white; font-weight:bold; text-decoration:none; border:2px solid rgba(255,255,255,0.3);
+       position:relative; overflow:hidden; transition:0.4s; box-shadow:0 6px 20px rgba(0,0,0,0.6);}
+a.btn::before {content:""; position:absolute; top:0; left:-75%; width:50%; height:100%;
+               background:rgba(255,255,255,0.15); transform:skewX(-25deg); transition:0.5s; pointer-events:none;}
+a.btn:hover::before {left:125%;}
+a.btn:hover {background:rgba(0,140,255,0.6); transform:scale(1.05); box-shadow:0 10px 30px rgba(0,0,0,0.8);}
+
+pre {background:rgba(0,0,0,0.4); backdrop-filter:blur(12px); padding:20px; border-radius:18px;
+     text-align:left; margin-top:25px; color:#90ff90; font-size:14px; border:1px solid rgba(255,255,255,0.2);}
+</style>
+</head>
+<body>
+<div class="container">
+  <img class="qr" src="${qr}">
+  <div class="card">
+    <h2>WireGuard Configuration</h2>
+    <form id="renameForm">
+      <input type="text" id="confName" value="${defaultName}" placeholder="Enter config name">
+      <br>
+      <a href="#" class="btn" id="downloadBtn">Download Config</a>
+    </form>
+    <pre>${config}</pre>
+  </div>
+</div>
+
+<script>
+const btn = document.getElementById('downloadBtn');
+btn.addEventListener('click', e => {
+  e.preventDefault();
+  const name = document.getElementById('confName').value || '${defaultName}';
+  const blob = new Blob([\`${config}\`], {type:'text/plain'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = name + ".conf";
+  link.click();
+});
+</script>
+</body>
+</html>`, {headers:{"Content-Type":"text/html"}});
+  }
+
+  // ===== Home Page with Liquid-Glass Button =====
+  return new Response(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>WireGuard Panel</title>
+<style>
+body {margin:0; font-family:Arial; color:white;
+      background:linear-gradient(120deg,#0a0a0c,#12121c,#09090f);
+      background-size:400% 400%; animation:bg 16s ease infinite;}
+@keyframes bg{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+
+.card {background:rgba(255,255,255,0.05); backdrop-filter:blur(25px) saturate(200%);
+       border-radius:30px; padding:50px; max-width:550px; margin:120px auto;
+       box-shadow:0 12px 50px rgba(0,0,0,0.6); transition:0.4s; border:1px solid rgba(255,255,255,0.1);}
+.card:hover {box-shadow:0 20px 60px rgba(0,0,0,0.9); transform:translateY(-5px) scale(1.02);}
+
+.logo-container {display:inline-block; background:rgba(255,255,255,0.05);
+                 backdrop-filter:blur(20px) saturate(180%); border-radius:50%; padding:25px;
+                 margin-bottom:25px; box-shadow:0 8px 30px rgba(0,0,0,0.5);}
+.logo-container svg {width:140px;height:140px;}
+
+h1{font-size:28px;margin:20px 0 10px 0;}
+p{font-size:18px;margin:10px 0;}
+
+/* Liquid-glass button for Home page */
+a.btn {display:inline-block; margin-top:20px; padding:16px 32px; border-radius:50px;
+       background:rgba(0,140,255,0.35); backdrop-filter:blur(14px);
+       color:white; font-weight:bold; text-decoration:none; border:2px solid rgba(255,255,255,0.3);
+       position:relative; overflow:hidden; transition:0.4s; box-shadow:0 6px 20px rgba(0,0,0,0.6);}
+a.btn::before {content:""; position:absolute; top:0; left:-75%; width:50%; height:100%;
+               background:rgba(255,255,255,0.15); transform:skewX(-25deg); transition:0.5s; pointer-events:none;}
+a.btn:hover::before {left:125%;}
+a.btn:hover {background:rgba(0,140,255,0.6); transform:scale(1.05); box-shadow:0 10px 30px rgba(0,0,0,0.8);}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo-container">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300">
+      <circle cx="150" cy="150" r="150" fill="#2ecc71"/>
+      <path fill="#fff" d="M150 40a110 110 0 1 0 110 110A110.13 110.13 0 0 0 150 40zm0 190a80 80 0 1 1 80-80 80.09 80.09 0 0 1-80 80z"/>
+    </svg>
+  </div>
+  <h1>👋 Welcome to WireGuard Panel 🎉</h1>
+  <p>✨ Secure your network with ease! 🌐</p>
+  <a class="btn" href="/generate?name=${defaultName}">Generate Config</a>
+</div>
+</body>
+</html>`, {headers:{"Content-Type":"text/html"}});
+}
