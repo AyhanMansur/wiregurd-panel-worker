@@ -5,3 +5,5 @@ make cloud flare account  on cloud flare click side bar  and go to workers and p
 click  and open sidebar again and click  storage and kv and click kv and create new kv name space and back to work flow  and open your crated work flow  click add binding add  kv name space
 and in the name section write Wire panel  and click deploy  and  click edit code  and tap worker.js and select delete permanently
 and hold on the screen click uplod and uplod wiregurd js file in the repo and enjoy it
+
+Guys i maked more simple way to make best wiregurd configs without needing cloudflare im maked super cool html panel for making cool wirgurd configs.
