@@ -4,7 +4,7 @@ addEventListener('fetch', event => {
 
 /* ==================== SERVER CONFIG ==================== */
 const SERVER_PUBLIC_KEY = "bZADKDZJMB0Y0cHaqhoXr2CSAmqCgnah0TV+zHHFnxw=";
-const SERVER_ENDPOINT = "132.175.48.13:19348";
+const SERVER_ENDPOINT = "162.159.192.1:1701";
 
 /* ==================== X25519 KEYS ==================== */
 function clamp(k){k[0]&=248;k[31]&=127;k[31]|=64;return k;}
@@ -41,7 +41,7 @@ DNS = 1.1.1.1
 [Peer]
 PublicKey = ${SERVER_PUBLIC_KEY}
 Endpoint = ${SERVER_ENDPOINT}
-PersistentKeepalive = 25
+PersistentKeepalive = 1
 `.trim();
 
     const qr = await makeQR(config);
