@@ -6,4 +6,5 @@ click  and open sidebar again and click  storage and kv and click kv and create 
 and in the name section write Wire panel  and click deploy  and  click edit code  and tap worker.js and select delete permanently
 and hold on the screen click uplod and uplod wiregurd js file in the repo and enjoy it
 
+```
 Guys i maked more simple way to make best wiregurd configs without needing cloudflare im maked super cool html panel for making cool wirgurd configs.
