@@ -45,7 +45,7 @@ I created a **Super Cool HTML Panel** that runs directly in your browser. You do
 
 Just open the HTML file, configure your settings, and download your WireGuard config instantly!
 
-👉 **[Click here to access the HTML Panel](path-to-your-html-file.html)
+👉 **[Click here to access the HTML Panel](https://ayhanmansur.github.io/wiregurd-panel-worker/)
 
 ---
 
