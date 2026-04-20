@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل وایرگارد VPN</title>
+    <style>        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Vazirmatn', sans-serif; 
+            background: #f5f5f7;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: #000000;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            border-radius: 20px;
+            padding: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            overflow: hidden;
+            border: 0.5px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .container {
+            background: rgba(28, 28, 30, 0.72);
+            border: 0.5px solid rgba(84, 84, 88, 0.48);
+        }
+
+        .header {
+            padding: 24px 20px 20px 20px;
+            text-align: center;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode .header {
+            border-bottom-color: rgba(84, 84, 88, 0.48);
+        }
+
+        .header h1 {
+            color: #1d1d1f;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            letter-spacing: -0.5px;
+        }
+
+        body.dark-mode .header h1 {
+            color: #f5f5f7;
+        }
+
+        .header p {
+            color: #86868b;
+            font-size: 14px;
+            font-weight: 400;
+        } 
+
+        body.dark-mode .header p {
+            color: #98989d;
+        }
+
+        .content {
+            padding: 24px 20px;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            color: #1d1d1f;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 4px;
+        }
+
+        body.dark-mode .section-title {
+            color: #98989d;
+        }
+
+        .input-group {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 0.5px solid rgba(0, 0, 0, 0.04);
+            transition: all 0.2s ease;
+        }
+
+        body.dark-mode .input-group {
+            background: rgba(44, 44, 46, 0.8);
+            border-color: rgba(84, 84, 88, 0.48);
+        }
+
+        .input-row {
+            padding: 12px 16px;
+            border-bottom: 0.5px solid rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-row:last-child {
+            border-bottom: none;
+        }
+
+        body.dark-mode .input-row {
+            border-bottom-color: rgba(84, 84, 88, 0.48);
+        }
+
+        .input-icon {
+            font-size: 18px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .input-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        label {
+            color: #86868b;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark-mode label {
+            color: #98989d;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            font-weight: 400;
+            color: #1d1d1f;
+            font-family: -apple-system, BlinkMacSystemFont, 'Vazirmatn', sans-serif;
+            outline: none;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            color: #f5f5f7;
+        }
+
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        select {
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: -apple-system, BlinkMacSystemFont, 'Vazirmatn', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #007aff;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #0051d5;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: rgba(120, 120, 128, 0.16);
+            color: #007aff;
+        }
+
+        body.dark-mode .btn-secondary {
+            background: rgba(84, 84, 88, 0.48);
+            color: #0a84ff;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(120, 120, 128, 0.24);
+        }
+
+        body.dark-mode .btn-secondary:hover {
+            background: rgba(84, 84, 88, 0.65);
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .output-container {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 0.5px solid rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode .output-container {
+            background: rgba(44, 44, 46, 0.8);
+            border-color: rgba(84, 84, 88, 0.48);
+        }
+
+        #output {
+            color: #1d1d1f;
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+        }
+
+        body.dark-mode #output {
+            color: #f5f5f7;
+        }
+
+        .output-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .output-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .output-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        body.dark-mode .output-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .notification {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            color: #1d1d1f;
+            padding: 12px 24px;
+            border-radius: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            animation: slideDown 0.3s ease;
+            z-index: 1000;
+            display: none;
+            font-size: 14px;
+            font-weight: 500;
+            border: 0.5px solid rgba(0, 0, 0, 0.04);
+        }
+
+        body.dark-mode .notification {
+            background: rgba(44, 44, 46, 0.92);
+            color: #f5f5f7;
+            border-color: rgba(84, 84, 88, 0.48);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(0, 0, 0, 0.04);
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        body.dark-mode .theme-toggle {
+            background: rgba(44, 44, 46, 0.8);
+            border-color: rgba(84, 84, 88, 0.48);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .theme-switch {
+            position: relative;
+            width: 44px;
+            height: 26px;
+            background: rgba(120, 120, 128, 0.16);
+            border-radius: 20px;
+            transition: background 0.3s;
+        }
+
+        body.dark-mode .theme-switch {
+            background: #007aff;
+        }
+
+        .theme-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode .theme-slider {
+            transform: translateX(18px);
+        }
+
+        .theme-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+
+        body.dark-mode .theme-text {
+            color: #f5f5f7;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .lock-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .lock-icon {
+            font-size: 72px;
+            margin-bottom: 24px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .info-box {
+            background: rgba(0, 122, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #007aff;
+            line-height: 1.5;
+        }
+
+        body.dark-mode .info-box {
+            background: rgba(10, 132, 255, 0.16);
+            color: #0a84ff;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            .content {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- دکمه تغییر تم -->
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span>
+        <div class="theme-switch">
+            <div class="theme-slider"></div>
+        </div>
+        <span class="theme-text" id="themeText">روشن</span>
+    </div>
+
+    <!-- صفحه ورود -->
+    <div class="lock-screen" id="loginScreen">
+        <div class="container" style="max-width: 380px;">
+            <div class="header">
+                <div class="lock-icon">🔒</div>
+                <h1>ورود به پنل</h1>
+                <p>لطفاً رمز عبور را وارد کنید</p>
+            </div>
+            <div class="content">
+                <div class="input-group">
+                    <div class="input-row">
+                        <span class="input-icon">🔑</span>
+                        <div class="input-content">
+                            <label for="passwordInput">رمز عبور</label>
+                            <input type="password" id="passwordInput" placeholder="رمز عبور را وارد کنید" onkeypress="handleKeyPress(event)">
+                        </div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="checkPassword()">ورود به پنل</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- پنل اصلی -->
+    <div class="hidden" id="mainPanel">
+        <div class="container">
+            <div class="header">
+                <h1>🌿🏁WireGuard</h1>
+                <p>تولید کانفیگ VPN</p
+            </div>
+
+            <div class="content">
+                <div class="info-box">
+                    💡 برای اتصال موفق، اطلاعات واقعی سرور را از ادمین دریافت کنید
+                </div>
+
+                <div class="section">
+                    <div class="section-title">اطلاعات کلاینت</div>
+                    <div class="input-group">
+                        <div class="input-row">
+                            <span class="input-icon">🌐</span>
+                            <div class="input-content">
+                                <label for="clientIP">آدرس IP</label>
+                                <input type="text" id="clientIP" value="172.16.0.2/32">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">اطلاعات سرور</div>
+                    <div class="input-group">
+                        <div class="input-row">
+                            <span class="input-icon">🔑</span>
+                            <div class="input-content">
+                                <label for="serverPublicKey">کلید عمومی سرور</label>
+                                <input type="text" id="serverPublicKey" value="1mpGoyxD6MOJphN0qi3K1fG0Rt1+lWZge6dJs9vbhiw=">
+                                <textarea id="serverPublicKey" placeholder="Public Key سرور را وارد کنید"></textarea>
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <span class="input-icon">🌍</span>
+                            <div class="input-content">
+                                <label for="serverEndpoint">آدرس سرور</label>
+                                <input type="text" id="serverEndpoint" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">تنظیمات شبکه</div>
+                    <div class="input-group">
+                        <div class="input-row">
+                            <span class="input-icon">🔓</span>
+                            <div class="input-content">
+                                <label for="allowedIPs">Allowed IPs</label>
+                                <input type="text" id="allowedIPs" value="0.0.0.0/0, ::/0">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <span class="input-icon">🔍</span>
+                            <div class="input-content">
+                                <label for="dnsProvider">DNS</label>
+                                <select id="dnsProvider">
+                                    <option value="shecan">شکن (Shecan)</option>
+                                    <option value="403">403.online</option>
+                                    <option value="electro">الکترو</option>
+                                    <option value="google">گوگل</option>
+                                    <option value="cloudflare">Cloudflare</option>
+                                    <option value="opendns">OpenDNS</option>
+                                    <option value="quad9">Quad9</option>
+                                    <option value="custom">سفارشی</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-row hidden" id="customDnsRow">
+                            <span class="input-icon">🔧</span>
+                            <div class="input-content">
+                                <label for="customDns">DNS سفارشی</label>
+                                <input type="text" id="customDns" placeholder="8.8.8.8, 8.8.4.4">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <span class="input-icon">⚙️</span>
+                            <div class="input-content">
+                                <label for="mtu">MTU</label>
+                                <input type="number" id="mtu" value="1420" min="1200" max="1500">
+                            </div>
+                        </div>
+                        <div class="input-row">
+                            <span class="input-icon">⏱️</span>
+                            <div class="input-content">
+                                <label for="k ">Keepalive (ثانیه)</label>
+                                <input type="number" id="keepalive" value="25" min="0" max="60">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-primary" onclick="generateConfig()">تولید کانفیگ</button>
+                    <div class="btn-row">
+                        <button class="btn-secondary" onclick="copyToClipboard()">📋 کپی</button>
+                        <button class="btn-secondary" onclick="saveToFile()">💾 دانلود</button>
+                        <button class="btn-secondary" onclick="clearOutput()">🗑️ پاک</button>
+                    </div>
+                </div>
+
+                <div class="output-container">
+                    <pre id="output">فیلدها را پر کنید و دکمه "تولید کانفیگ" را بزنید...</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // بارگذاری تم
+        window.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeIcon').textContent = '☀️';
+                document.getElementById('themeText').textContent = 'تاریک';
+            }
+        });
+
+        // تغییر تم
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.textContent = '☀️';
+                themeText.textContent = 'تاریک';
+                localStorage.setItem('theme', 'dark');
+                showNotification('حالت تاریک فعال شد');
+            } else {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'روشن';
+                localStorage.setItem('theme', 'light');
+                showNotification('حالت روشن فعال شد');
+            }
+        }
+
+        // نمایش DNS سفارشی
+        document.getElementById('dnsProvider').addEventListener('change', function() {
+            const customRow = document.getElementById('customDnsRow');
+            if (this.value === 'custom') {
+                customRow.classList.remove('hidden');
+            } else {
+                customRow.classList.add('hidden');
+            }
+        });
+
+        // بررسی رمز عبور
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === 'Ayhan12') {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainPanel').classList.remove('hidden');
+                showNotification('ورود موفقیت‌آمیز');
+            } else {
+                showNotification('رمز عبور اشتباه است');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkPassword();
+            }
+        }
+
+        // تولید کلید خصوصی
+        function generatePrivateKey() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            array[0] &= 248;
+            array[31] &= 127;
+            array[31] |= 64;
+            return btoa(String.fromCharCode(...array));
+        }
+
+        let generatedConfig = '';
+
+        function getDNS() {
+            const dnsProvider = document.getElementById('dnsProvider').value;
+            
+            if (dnsProvider === 'custom') {
+                return document.getElementById('customDns').value || '8.8.8.8, 8.8.4.4';
+            }
+            
+            const dnsOptions = {
+                'shecan': '178.22.122.100, 185.51.200.2',
+                '403': '10.202.10.10, 10.202.10.11',
+                'electro': '78.157.42.100, 78.157.42.101',
+                'google': '8.8.8.8, 8.8.4.4',
+                'cloudflare': '1.1.1.1, 1.0.0.1',
+                'opendns': '208.67.222.222, 208.67.220.220',
+                'quad9': '9.9.9.9, 149.112.112.112'
+            };
+            return dnsOptions[dnsProvider];
+        }
+
+        function generateConfig() {
+            const clientIP = document.getElementById('clientIP').value.trim();
+            const serverPublicKey = document.getElementById('serverPublicKey').value.trim();
+            const serverEndpoint = document.getElementById('serverEndpoint').value.trim();
+            const allowedIPs = document.getElementById('allowedIPs').value.trim();
+            const mtu = document.getElementById('mtu').value;
+            const keepalive = document.getElementById('keepalive').value;
+            const dns = getDNS();
+            
+            if (!serverPublicKey) {
+                showNotification('کلید عمومی سرور را وارد کنید');
+                return;
+            }
+            
+            if (!serverEndpoint) {
+                showNotification('آدرس سرور را وارد کنید');
+                return;
+            }
+
+            if (!clientIP) {
+                showNotification('آدرس IP کلاینت را وارد کنید');
+                return;
+            }
+            
+            const privateKey = generatePrivateKey();
+            
+            const config = `[Interface]
+PrivateKey = ${privateKey}
+Address = ${clientIP}
+DNS = ${dns}
+MTU = ${mtu}
+
+[Peer]
+PublicKey = ${serverPublicKey}
+AllowedIPs = ${allowedIPs}
+Endpoint = ${serverEndpoint}
+Persist
+PersistentKeepalive = ${keepalive}
+`;
+
+            document.getElementById('output').textContent = config;
+            generatedConfig = config;
+            showNotification('کانفیگ با موفقیت ساخته شد');
+        }
+
+        function copyToClipboard() {
+            if (!generatedConfig) {
+                showNotification('ابتدا کانفیگ را بسازید');
+                return;
+            }
+
+            const textarea = document.createElement('textarea');
+            textarea.value = generatedConfig;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showNotification('کانفیگ کپی شد');
+        }
+
+        function saveToFile() {
+            if (!generatedConfig) {
+                showNotification('ابتدا کانفیگ را بسازید');
+                return;
+            }
+
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const filename = `wireguard_${timestamp}.conf`;
+            
+            const blob = new Blob([generatedConfig], { type: 'application/octet-stream' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showNotification('فایل دانلود شد');
+        }
+
+        function clearOutput() {
+            document.getElementById('output').textContent = 'فیلدها را پر کنید و دکمه "تولید کانفیگ" را بزنید...';
+            generatedConfig = '';
+            showNotification('خروجی پاک شد');
+        }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
