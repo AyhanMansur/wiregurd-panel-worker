@@ -45,7 +45,7 @@ I created a **Super Cool HTML Panel** that runs directly in your browser. You do
 
 Just open the HTML file, configure your settings, and download your WireGuard config instantly!
 
-👉 **[Click here to access the HTML Panel](path-to-your-html-file.html)** *(Replace with your actual file link)*
+👉 **[Click here to access the HTML Panel](path-to-your-html-file.html)
 
 ---
 
@@ -54,9 +54,12 @@ Just open the HTML file, configure your settings, and download your WireGuard co
 - 🔒 **Full Control:** You own the configuration and the data.
 - ⚡ **Lightning Fast:** Cloudflare's global network ensures low latency.
 - 🛡️ **Secure:** Perfect for bypassing restrictions and protecting privacy.
+- 🔒 #Pass = Ayhan12
 
 ---
 
 <p align="center">
   <i>Build your own infrastructure today! 🌐✨</i>
 </p>
+
+@ 𝔸𝕪𝕙𝕒𝕟𝕄𝕒𝕟𝕤𝕦𝕣 𝟚𝟘𝟚𝟞
