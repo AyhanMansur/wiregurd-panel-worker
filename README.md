@@ -1,8 +1,7 @@
-### 🌩️ Cloudflare Workers
-*Fast, Secure, and Free Hosting*
+<img width="1919" height="1079" alt="Screenshot 2025-12-11 060458" src="https://github.com/user-attachments/assets/092aa29e-8c92-420f-9c0a-2b7b2c62a3aa" />
 
-### 🛡️ WireGuard
-*Lightweight & Secure Tunneling*
+---
+
 ## 🛠️ Build Your Own WireGuard Panel (No Domain Needed!)
 
 Want to create your own secure WireGuard panel without buying a domain or hosting? I've got you covered with two methods!
