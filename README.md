@@ -21,7 +21,7 @@ Follow this simple guide to deploy your panel on Cloudflare's free tier:
     - Go back to your **Worker** page.
     - Click **Add binding** → Select **KV Namespace**.
     - Choose the namespace you created.
-    - In the **Variable name** field, type: `WIRE_PANEL`.
+    - In the **Variable name** field, type: `WG`.
     - Click **Save**.
 5.  **Deploy & Upload Code:**
     - Click **Deploy**.
